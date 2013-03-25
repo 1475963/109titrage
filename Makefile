@@ -5,11 +5,13 @@
 ## Login   <benzah_m@epitech.net>
 ## 
 ## Started on  Mon Feb 11 11:56:57 2013 marc benzahra
-## Last update Mon Mar 25 14:41:12 2013 marc benzahra
+## Last update Mon Mar 25 15:29:05 2013 marc benzahra
 ##
 
-SRC=		109titrage.c
-SRC_SDL=	109titrage_sdl.c
+SRC=		109titrage.c	\
+		coregnl.c	\
+
+SRC_SDL=	109titrage_sdl.c	\
 
 OBJ=		$(SRC:.c=.o)
 OBJ_SDL=	$(SRC_SDL:.c=.o)

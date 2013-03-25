@@ -5,10 +5,11 @@
 ** Login   <benzah_m@epitech.net>
 ** 
 ** Started on  Mon Mar 25 14:51:31 2013 marc benzahra
-** Last update Mon Mar 25 15:11:14 2013 marc benzahra
+** Last update Mon Mar 25 16:34:52 2013 marc benzahra
 */
 
 #include "titrage.h"
+#include "coregnl.h"
 
 void	exit_error(char *function, char *file, char *block)
 {
@@ -31,6 +32,64 @@ void    my_pixel_put_to_image(int x, int y, char *data, t_color *color)
   data[0] = color->r;
   data[1] = color->g;
   data[2] = color->b;
+}
+
+void		draw_line(t_ptr *ptr, char *data, double x1, double y1, double x2, double y2)
+{
+  double	x;
+  double	y;
+  t_color	color;
+
+  srand(time(NULL));
+  color.r = rand() % 256;
+  color.g = rand() % 256;
+  color.b = rand() % 256;
+  y = y1;
+  x = x1;
+  if (y1 > y2)
+    while (y > y2)
+      {
+	x = x1 + ((x2 - x1) * (y - y1)) / (y2 - y1);
+	my_pixel_put_to_image(x, y, data, &color);
+	y = y - 1;
+      }
+  else
+    while (y <= y2)
+      {
+	x = x1 + ((x2 - x1) * (y - y1)) / (y2 - y1);
+	my_pixel_put_to_image(x, y, data, &color);
+	y = y + 1;
+      }
+  mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, 0, 0);
+}
+
+void		draw_line_more(t_ptr *ptr, char *data, double x1, double y1, double x2, double y2)
+{
+  double	x;
+  double	y;
+  t_color	color;
+
+  srand(time(NULL));
+  color.r = rand() % 256;
+  color.g = rand() % 256;
+  color.b = rand() % 256;
+  y = y1;
+  x = x1;
+  if (x1 > x2)
+    while (x > x2)
+      {
+	y = y1 + ((y2 - y1) * (x - x1)) / (x2 - x1);
+	my_pixel_put_to_image(x, y, data, &color);
+	x = x - 1;
+      }
+  else
+    while (x <= x2)
+      {
+	y = y1 + ((y2 - y1) * (x - x1)) / (x2 - x1);
+	my_pixel_put_to_image(x, y, data, &color);
+	x = x + 1;
+      }
+  mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, 0, 0);
 }
 
 void		draw_horizontal(t_ptr *ptr, char *data, double x1, double y1, double x2, double y2)
@@ -87,24 +146,6 @@ void		draw_vertical(t_ptr *ptr, char *data, double x1, double y1, double x2, dou
 
 void	draw_graph(t_ptr *ptr)
 {
-  mlx_string_put(ptr->mlx, ptr->win, 100, 915, 000255255255, "-2.0");
-  mlx_string_put(ptr->mlx, ptr->win, 200, 915, 000255255255, "-1.5");
-  mlx_string_put(ptr->mlx, ptr->win, 300, 915, 000255255255, "-1.0");
-  mlx_string_put(ptr->mlx, ptr->win, 400, 915, 000255255255, "-0.5");
-  mlx_string_put(ptr->mlx, ptr->win, 500, 915, 000255255255, "0.0");
-  mlx_string_put(ptr->mlx, ptr->win, 600, 915, 000255255255, "0.5");
-  mlx_string_put(ptr->mlx, ptr->win, 700, 915, 000255255255, "1.0");
-  mlx_string_put(ptr->mlx, ptr->win, 800, 915, 000255255255, "1.5");
-  mlx_string_put(ptr->mlx, ptr->win, 900, 915, 000255255255, "2");
-  mlx_string_put(ptr->mlx, ptr->win, 75, 900, 000255255255, "-2.0");
-  mlx_string_put(ptr->mlx, ptr->win, 75, 800, 000255255255, "-1.5");
-  mlx_string_put(ptr->mlx, ptr->win, 75, 700, 000255255255, "-1.0");
-  mlx_string_put(ptr->mlx, ptr->win, 75, 600, 000255255255, "-0.5");
-  mlx_string_put(ptr->mlx, ptr->win, 80, 500, 000255255255, "0.0");
-  mlx_string_put(ptr->mlx, ptr->win, 80, 400, 000255255255, "0.5");
-  mlx_string_put(ptr->mlx, ptr->win, 80, 300, 000255255255, "1.0");
-  mlx_string_put(ptr->mlx, ptr->win, 80, 200, 000255255255, "1.5");
-  mlx_string_put(ptr->mlx, ptr->win, 80, 100, 000255255255, "2.0");
 }
 
 int	manage_expose(void *param)
@@ -124,11 +165,81 @@ int	manage_key(int keycode, void *param)
   return (0);
 }
 
-void	first_option()
+void		first_option()
 {
+  char		*buffer;
+  char		*x;
+  char		*y;
+  double	xold;
+  double	yold;
+  int		i;
+  int		pos;
+  t_ptr		ptr;
+  t_data	data;
+  t_color	color;
+
+  xold = 0;
+  yold = 0;
+  color.r = 255;
+  color.g = 255;
+  color.b = 255;
+  ptr.mlx = mlx_init();
+  ptr.win = mlx_new_window(ptr.mlx, 1000, 1000, "GRAPH");
+  ptr.img = mlx_new_image(ptr.mlx, 1000, 1000);
+  data.data = mlx_get_data_addr(ptr.img, &data.bpp, &data.sizeline, &data.endian);
+  while (strcmp(buffer, "FIN") != 0)
+    {
+      if ((buffer = coregnl(0)) == NULL)
+	exit_error("getline", "109titrage.c", "first_option");
+      if (strcmp(buffer, "FIN") != 0)
+	{
+	  if ((x = malloc(BUFF_SIZE)) == NULL)
+	    exit_error("malloc", "109transfert", "first_option");
+	  i = 0;
+	  pos = 0;
+	  while (buffer[i] != ';' && buffer[i] != '\0')
+	    {
+	      x[pos] = buffer[i];
+	      pos = pos + 1;
+	      i = i + 1;
+	    }
+	  x[pos] = '\0';
+	  if (buffer[i] == ';')
+	    i = i + 1;
+	  if ((y = malloc(BUFF_SIZE)) == NULL)
+	    exit_error("malloc", "109transfert", "first_option");
+	  pos = 0;
+	  while (buffer[i] != '\0')
+	    {
+	      y[pos] = buffer[i];
+	      pos = pos + 1;
+	      i = i + 1;
+	    }
+	  y[pos] = '\0';
+	  printf("%s\n", buffer);
+	  printf("x = (%s)\ty = (%s)\n", x, y);
+	  printf("x = (%f)\ty = (%f)\n", atof(x), atof(y));
+	  my_pixel_put_to_image(100 + atof(x) * 40, 900 - atof(y) * 40, data.data, &color);
+	  draw_line(&ptr, data.data, 100 + xold * 40, 900 - yold * 40, 100 + atof(x) * 40, 900 - atof(y) * 40);
+	  draw_line_more(&ptr, data.data, 100 + xold * 40, 900 - yold * 40, 100 + atof(x) * 40, 900 - atof(y) * 40);
+	  my_pixel_put_to_image(100 + atof(x) * 40, 900 - ((yold - atof(y)) / (xold - atof(x))) * 40, data.data, &color);
+	  printf("DERIVEE HERE : x = (%f)\ty = (%f)\n", atof(x), ((yold - atof(y)) / (xold - atof(x))));
+	  xold = atof(x);
+	  yold = atof(y);
+	  free(x);
+	  free(y);
+	}
+    }
+  mlx_put_image_to_window(ptr.mlx, ptr.win, ptr.img, 0, 0);
+  draw_horizontal(&ptr, data.data, 100, 900, 900, 900);
+  draw_vertical(&ptr, data.data, 100, 900, 100, 100);
+  draw_graph(&ptr);
+  mlx_expose_hook(ptr.win, manage_expose, (void *)&ptr);
+  mlx_key_hook(ptr.win, manage_key, (void *)&ptr);
+  mlx_loop(ptr.mlx);
 }
 
-void	second_option()
+void	second_option(int angle)
 {
 }
 
