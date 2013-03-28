@@ -5,7 +5,7 @@
 ** Login   <benzah_m@epitech.net>
 ** 
 ** Started on  Mon Mar 25 14:51:31 2013 marc benzahra
-** Last update Mon Mar 25 16:34:52 2013 marc benzahra
+** Last update Tue Mar 26 15:12:46 2013 marc benzahra
 */
 
 #include "titrage.h"
@@ -146,6 +146,52 @@ void		draw_vertical(t_ptr *ptr, char *data, double x1, double y1, double x2, dou
 
 void	draw_graph(t_ptr *ptr)
 {
+  mlx_string_put(ptr->mlx, ptr->win, 100, 915, 000255255255, "0");
+  mlx_string_put(ptr->mlx, ptr->win, 140, 915, 000255255255, "1");
+  mlx_string_put(ptr->mlx, ptr->win, 180, 915, 000255255255, "2");
+  mlx_string_put(ptr->mlx, ptr->win, 220, 915, 000255255255, "3");
+  mlx_string_put(ptr->mlx, ptr->win, 260, 915, 000255255255, "4");
+  mlx_string_put(ptr->mlx, ptr->win, 300, 915, 000255255255, "5");
+  mlx_string_put(ptr->mlx, ptr->win, 340, 915, 000255255255, "6");
+  mlx_string_put(ptr->mlx, ptr->win, 380, 915, 000255255255, "7");
+  mlx_string_put(ptr->mlx, ptr->win, 420, 915, 000255255255, "8");
+  mlx_string_put(ptr->mlx, ptr->win, 460, 915, 000255255255, "9");
+  mlx_string_put(ptr->mlx, ptr->win, 500, 915, 000255255255, "10");
+  mlx_string_put(ptr->mlx, ptr->win, 540, 915, 000255255255, "11");
+  mlx_string_put(ptr->mlx, ptr->win, 580, 915, 000255255255, "12");
+  mlx_string_put(ptr->mlx, ptr->win, 620, 915, 000255255255, "13");
+  mlx_string_put(ptr->mlx, ptr->win, 660, 915, 000255255255, "14");
+  mlx_string_put(ptr->mlx, ptr->win, 700, 915, 000255255255, "15");
+  mlx_string_put(ptr->mlx, ptr->win, 740, 915, 000255255255, "16");
+  mlx_string_put(ptr->mlx, ptr->win, 780, 915, 000255255255, "17");
+  mlx_string_put(ptr->mlx, ptr->win, 820, 915, 000255255255, "18");
+  mlx_string_put(ptr->mlx, ptr->win, 860, 915, 000255255255, "19");
+  mlx_string_put(ptr->mlx, ptr->win, 900, 915, 000255255255, "20");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 900, 000255255255, "0");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 860, 000255255255, "1");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 820, 000255255255, "2");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 780, 000255255255, "3");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 740, 000255255255, "4");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 700, 000255255255, "5");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 660, 000255255255, "6");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 620, 000255255255, "7");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 580, 000255255255, "8");
+  mlx_string_put(ptr->mlx, ptr->win, 90, 540, 000255255255, "9");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 500, 000255255255, "10");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 460, 000255255255, "11");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 420, 000255255255, "12");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 380, 000255255255, "13");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 340, 000255255255, "14");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 300, 000255255255, "15");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 260, 000255255255, "16");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 220, 000255255255, "17");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 180, 000255255255, "18");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 140, 000255255255, "19");
+  mlx_string_put(ptr->mlx, ptr->win, 85, 100, 000255255255, "20");
+  mlx_string_put(ptr->mlx, ptr->win, 400, 50, 000255255255, "Courbe du pH en fonction du volume");
+  mlx_string_put(ptr->mlx, ptr->win, 440, 950, 000255255255, "Volume de soude en mL");
+  mlx_string_put(ptr->mlx, ptr->win, 50, 495, 000255255255, "p");
+  mlx_string_put(ptr->mlx, ptr->win, 50, 510, 000255255255, "H");
 }
 
 int	manage_expose(void *param)
@@ -172,6 +218,9 @@ void		first_option()
   char		*y;
   double	xold;
   double	yold;
+  double	res;
+  double	xmax;
+  double	ymax;
   int		i;
   int		pos;
   t_ptr		ptr;
@@ -180,6 +229,9 @@ void		first_option()
 
   xold = 0;
   yold = 0;
+  xmax = 0;
+  ymax = 0;
+  res = 0;
   color.r = 255;
   color.g = 255;
   color.b = 255;
@@ -222,8 +274,15 @@ void		first_option()
 	  my_pixel_put_to_image(100 + atof(x) * 40, 900 - atof(y) * 40, data.data, &color);
 	  draw_line(&ptr, data.data, 100 + xold * 40, 900 - yold * 40, 100 + atof(x) * 40, 900 - atof(y) * 40);
 	  draw_line_more(&ptr, data.data, 100 + xold * 40, 900 - yold * 40, 100 + atof(x) * 40, 900 - atof(y) * 40);
-	  my_pixel_put_to_image(100 + atof(x) * 40, 900 - ((yold - atof(y)) / (xold - atof(x))) * 40, data.data, &color);
-	  printf("DERIVEE HERE : x = (%f)\ty = (%f)\n", atof(x), ((yold - atof(y)) / (xold - atof(x))));
+	  my_pixel_put_to_image(100 + atof(x) * 40, 900 - res * 40, data.data, &color);
+	  if (res != 0)
+	    {
+	      draw_line(&ptr, data.data, 100 + xold * 40, 900 - res * 40, 100 + atof(x) * 40, 900 - ((yold - atof(y)) / (xold - atof(x))) * 40);
+	      draw_line_more(&ptr, data.data, 100 + xold * 40, 900 - res * 40, 100 + atof(x) * 40, 900 - ((yold - atof(y)) / (xold - atof(x))) * 40);
+	    }
+	  printf("DERIVEE HERE : x = (%f)\ty = (%f)\n", atof(x), res);
+	  if (xold - atof(x) != 0)
+	    res = (yold - atof(y)) / (xold - atof(x));
 	  xold = atof(x);
 	  yold = atof(y);
 	  free(x);
