@@ -5,11 +5,13 @@
 ** Login   <benzah_m@epitech.net>
 ** 
 ** Started on  Mon Mar 25 14:51:31 2013 marc benzahra
-** Last update Tue Mar 26 15:12:46 2013 marc benzahra
+** Last update Thu Mar 28 18:15:56 2013 marc benzahra
 */
 
 #include "titrage.h"
 #include "coregnl.h"
+
+double	xmax = 0;
 
 void	exit_error(char *function, char *file, char *block)
 {
@@ -144,6 +146,11 @@ void		draw_vertical(t_ptr *ptr, char *data, double x1, double y1, double x2, dou
     }
 }
 
+void	draw_voleq(t_ptr *ptr)
+{
+  mlx_string_put(ptr->mlx, ptr->win, 100 + xmax * 40 - 15, 90, 000255255255, "VolEq");
+}
+
 void	draw_graph(t_ptr *ptr)
 {
   mlx_string_put(ptr->mlx, ptr->win, 100, 915, 000255255255, "0");
@@ -201,6 +208,7 @@ int	manage_expose(void *param)
   p = (t_ptr *)param;
   mlx_put_image_to_window(p->mlx, p->win, p->img, 0, 0);
   draw_graph(p);
+  draw_voleq(p);
   return (0);
 }
 
@@ -216,22 +224,17 @@ void		first_option()
   char		*buffer;
   char		*x;
   char		*y;
-  double	xold;
-  double	yold;
-  double	res;
-  double	xmax;
-  double	ymax;
+  double	xold = 0;
+  double	yold = 0;
+  double	res = 0;
+  double	ymax = 0;
   int		i;
   int		pos;
   t_ptr		ptr;
   t_data	data;
   t_color	color;
 
-  xold = 0;
-  yold = 0;
-  xmax = 0;
-  ymax = 0;
-  res = 0;
+  //init color + mlx
   color.r = 255;
   color.g = 255;
   color.b = 255;
@@ -239,12 +242,16 @@ void		first_option()
   ptr.win = mlx_new_window(ptr.mlx, 1000, 1000, "GRAPH");
   ptr.img = mlx_new_image(ptr.mlx, 1000, 1000);
   data.data = mlx_get_data_addr(ptr.img, &data.bpp, &data.sizeline, &data.endian);
+  if ((buffer = malloc(BUFF_SIZE)) == NULL)
+    exit_error("malloc", "109transfert", "first_option");
   while (strcmp(buffer, "FIN") != 0)
     {
+      //recuperation ligne par ligne
       if ((buffer = coregnl(0)) == NULL)
 	exit_error("getline", "109titrage.c", "first_option");
       if (strcmp(buffer, "FIN") != 0)
 	{
+	  //extraction de x et y récuperée
 	  if ((x = malloc(BUFF_SIZE)) == NULL)
 	    exit_error("malloc", "109transfert", "first_option");
 	  i = 0;
@@ -268,31 +275,45 @@ void		first_option()
 	      i = i + 1;
 	    }
 	  y[pos] = '\0';
-	  printf("%s\n", buffer);
-	  printf("x = (%s)\ty = (%s)\n", x, y);
-	  printf("x = (%f)\ty = (%f)\n", atof(x), atof(y));
+	  //draw des x et y extrait + liaison en ligne
 	  my_pixel_put_to_image(100 + atof(x) * 40, 900 - atof(y) * 40, data.data, &color);
 	  draw_line(&ptr, data.data, 100 + xold * 40, 900 - yold * 40, 100 + atof(x) * 40, 900 - atof(y) * 40);
 	  draw_line_more(&ptr, data.data, 100 + xold * 40, 900 - yold * 40, 100 + atof(x) * 40, 900 - atof(y) * 40);
+	  //draw des points de la derivée
 	  my_pixel_put_to_image(100 + atof(x) * 40, 900 - res * 40, data.data, &color);
+	  //liaison des points en ligne sauf pour la première itération
 	  if (res != 0)
 	    {
 	      draw_line(&ptr, data.data, 100 + xold * 40, 900 - res * 40, 100 + atof(x) * 40, 900 - ((yold - atof(y)) / (xold - atof(x))) * 40);
 	      draw_line_more(&ptr, data.data, 100 + xold * 40, 900 - res * 40, 100 + atof(x) * 40, 900 - ((yold - atof(y)) / (xold - atof(x))) * 40);
 	    }
-	  printf("DERIVEE HERE : x = (%f)\ty = (%f)\n", atof(x), res);
+	  //recupération de la valeur maximum au fur et à mesure
+	  if (res > ymax)
+	    {
+	      ymax = res;
+	      xmax = atof(x);
+	    }
+	  //affectation resultat + check division par 0
 	  if (xold - atof(x) != 0)
 	    res = (yold - atof(y)) / (xold - atof(x));
+	  //changement des variables pas à pas pour avoir la mémoire de celui d'avant
 	  xold = atof(x);
 	  yold = atof(y);
+	  //free
 	  free(x);
 	  free(y);
 	}
     }
+  //obtention + affichage du volume équivalent
+  printf("volume équivalent : (%f)\n", xmax);
   mlx_put_image_to_window(ptr.mlx, ptr.win, ptr.img, 0, 0);
+  draw_vertical(&ptr, data.data, 100 + xmax * 40, 900, 100 + xmax * 40, 100);
+  draw_voleq(&ptr);
+  //axe + graduation
   draw_horizontal(&ptr, data.data, 100, 900, 900, 900);
   draw_vertical(&ptr, data.data, 100, 900, 100, 100);
   draw_graph(&ptr);
+  //expose key loop
   mlx_expose_hook(ptr.win, manage_expose, (void *)&ptr);
   mlx_key_hook(ptr.win, manage_key, (void *)&ptr);
   mlx_loop(ptr.mlx);
@@ -300,6 +321,104 @@ void		first_option()
 
 void	second_option(int angle)
 {
+  char		*buffer;
+  char		*x;
+  char		*y;
+  double	xold = 0;
+  double	yold = 0;
+  double	res = 0;
+  double	ymax = 0;
+  int		i;
+  int		pos;
+  t_ptr		ptr;
+  t_data	data;
+  t_color	color;
+
+  //init color + mlx
+  color.r = 255;
+  color.g = 255;
+  color.b = 255;
+  ptr.mlx = mlx_init();
+  ptr.win = mlx_new_window(ptr.mlx, 1000, 1000, "GRAPH");
+  ptr.img = mlx_new_image(ptr.mlx, 1000, 1000);
+  data.data = mlx_get_data_addr(ptr.img, &data.bpp, &data.sizeline, &data.endian);
+  if ((buffer = malloc(BUFF_SIZE)) == NULL)
+    exit_error("malloc", "109transfert", "first_option");
+  while (strcmp(buffer, "FIN") != 0)
+    {
+      //recuperation ligne par ligne
+      if ((buffer = coregnl(0)) == NULL)
+	exit_error("getline", "109titrage.c", "first_option");
+      if (strcmp(buffer, "FIN") != 0)
+	{
+	  //extraction de x et y dans la ligne récuperée
+	  if ((x = malloc(BUFF_SIZE)) == NULL)
+	    exit_error("malloc", "109transfert", "first_option");
+	  i = 0;
+	  pos = 0;
+	  while (buffer[i] != ';' && buffer[i] != '\0')
+	    {
+	      x[pos] = buffer[i];
+	      pos = pos + 1;
+	      i = i + 1;
+	    }
+	  x[pos] = '\0';
+	  if (buffer[i] == ';')
+	    i = i + 1;
+	  if ((y = malloc(BUFF_SIZE)) == NULL)
+	    exit_error("malloc", "109transfert", "first_option");
+	  pos = 0;
+	  while (buffer[i] != '\0')
+	    {
+	      y[pos] = buffer[i];
+	      pos = pos + 1;
+	      i = i + 1;
+	    }
+	  y[pos] = '\0';
+	  //draw des x et y extrait + liaison en ligne
+	  my_pixel_put_to_image(100 + atof(x) * 40, 900 - atof(y) * 40, data.data, &color);
+	  draw_line(&ptr, data.data, 100 + xold * 40, 900 - yold * 40, 100 + atof(x) * 40, 900 - atof(y) * 40);
+	  draw_line_more(&ptr, data.data, 100 + xold * 40, 900 - yold * 40, 100 + atof(x) * 40, 900 - atof(y) * 40);
+	  //affectation resultat + check division par 0
+	  if (xold - atof(x) != 0)
+	    res = (yold - atof(y)) / (xold - atof(x));
+	  //affichage de l'inclinaison de la tangente en chaque point
+	  printf("Degree = (%f)\n", floor(atan(res) * 180 / M_PI));
+	  //trouve et trace les tangentes meme plus que 2 pour l'instant
+	  if (floor(atan(res) * 180 / M_PI) == angle)
+	    {
+	      printf("superx = (%f)\tsupery = (%f)\tsuperres = (%f)\n", atof(x), atof(y), res);
+	      double	inc = 0;
+	      while (inc < 20)
+		{
+		  if ((res * (inc - atof(x)) + atof(y)) <= 20 && (res * (inc - atof(x)) + atof(y)) >= 0)
+		    my_pixel_put_to_image(100 + inc * 40, 900 - (res * (inc - atof(x)) + atof(y)) * 40, data.data, &color);
+		  inc = inc + 0.001;
+		}
+	    }
+	  //changement des variables pas à pas pour avoir la mémoire de celui d'avant
+	  xold = atof(x);
+	  yold = atof(y);
+	  //free (IL EN MANQUE FOK IT)
+	  free(x);
+	  free(y);
+	}
+    }
+  //obtention + affichage du volume équivalent
+  /*
+  printf("volume équivalent : (%f)\n", xmax);
+  mlx_put_image_to_window(ptr.mlx, ptr.win, ptr.img, 0, 0);
+  draw_vertical(&ptr, data.data, 100 + xmax * 40, 900, 100 + xmax * 40, 100);
+  draw_voleq(&ptr);
+  */
+  //axes + graduation
+  draw_horizontal(&ptr, data.data, 100, 900, 900, 900);
+  draw_vertical(&ptr, data.data, 100, 900, 100, 100);
+  draw_graph(&ptr);
+  //expose key loop
+  mlx_expose_hook(ptr.win, manage_expose, (void *)&ptr);
+  mlx_key_hook(ptr.win, manage_key, (void *)&ptr);
+  mlx_loop(ptr.mlx);
 }
 
 void	check_arg(char *str)

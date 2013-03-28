@@ -5,7 +5,7 @@
 ## Login   <benzah_m@epitech.net>
 ## 
 ## Started on  Mon Feb 11 11:56:57 2013 marc benzahra
-## Last update Mon Mar 25 15:29:05 2013 marc benzahra
+## Last update Thu Mar 28 15:50:13 2013 marc benzahra
 ##
 
 SRC=		109titrage.c	\
@@ -47,7 +47,7 @@ B_PINK=		\033[1;45m
 B_GAYBLUE=	\033[1;46m
 B_WHITE=	\033[1;47m
 
-all:	gw2 $(NAME)
+all:	evo $(NAME)
 
 $(NAME):	$(OBJ)
 	$(CC) -o $(NAME) $(OBJ) $(LIB)
@@ -146,3 +146,4 @@ evo:
 	@echo -e "$(BLINGBLING)"
 	@cat pokedex/006charizard
 	@sleep 1
+	@echo -e "$(RESET)"
