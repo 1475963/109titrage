@@ -10,7 +10,7 @@
 
 #ifndef COREGNL_H_
 # define COREGNL_H_
-# define BUFF_SIZE (8192)
+# define BUFF_SIZE (4096)
 # include <stdlib.h>
 
 char	*coregnl(const int fd);
