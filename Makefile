@@ -8,22 +8,22 @@
 ## Last update Thu Mar 28 15:50:13 2013 marc benzahra
 ##
 
-SRC=		109titrage.c	\
+SRC	=		109titrage.c	\
 		coregnl.c	\
 
-SRC_SDL=	109titrage_sdl.c	\
+SRC_SDL	=	109titrage_sdl.c	\
 
-OBJ=		$(SRC:.c=.o)
-OBJ_SDL=	$(SRC_SDL:.c=.o)
+OBJ	=		$(SRC:.c=.o)
+OBJ_SDL	=	$(SRC_SDL:.c=.o)
 
-RM=	rm -f
+RM	=	rm -f
 
-CC=	cc
+CC	=	cc
 
-NAME=	109titrage
+NAME	=	109titrage
 
-LIB=		-lm -L/usr/lib64 -lmlx_$(HOSTTYPE) -L/usr/lib64/X11 -lXext -lX11
-LIB_SDL=	-lm -L/usr/lib64 -lmlx_$(HOSTTYPE) -L/usr/lib64/X11 -lXext -lX11 -lSDL -lSDL_mixer
+LIB	=		-lm -L/usr/lib64 -lmlx_$(HOSTTYPE) -L/usr/lib64/X11 -lXext -lX11
+LIB_SDL	=	-lm -L/usr/lib64 -lmlx_$(HOSTTYPE) -L/usr/lib64/X11 -lXext -lX11 -lSDL -lSDL_mixer
 
 RESET=		\033[0m
 BIG=		\033[1;01m
